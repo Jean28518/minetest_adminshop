@@ -9,7 +9,7 @@ default.adminshop_current_shop_position = {}
 minetest.register_node("adminshop:adminshop", {
 
     description = "Adminshop",
-    tiles = {"dummy.png"},
+    tiles = {"shop.png"},
     is_ground_content = true,
     groups = {choppy=2},
     sounds = default.node_sound_wood_defaults(),
@@ -131,7 +131,7 @@ if minetest.get_modpath("licenses") ~= nil then
 	minetest.register_node("adminshop:adminshop_license", {
 
 	    description = "Adminshop with licenses integrated",
-	    tiles = {"dummy.png"},
+	    tiles = {"shop_licenses.png"},
 	    is_ground_content = true,
 	    groups = {choppy=2},
 	    sounds = default.node_sound_wood_defaults(),
