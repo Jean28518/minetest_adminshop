@@ -7,12 +7,17 @@ minetest.register_privilege("adminshop", {
 -- Globaler Arrayspeicher
 default.adminshop_current_shop_position = {}
 minetest.register_node("adminshop:adminshop", {
-
     description = "Adminshop",
-    tiles = {"shop.png"},
-    is_ground_content = true,
-    groups = {choppy=2},
-    sounds = default.node_sound_wood_defaults(),
+		tiles = {"shop_top.png",
+				"shop_top.png",
+				"shop.png",
+				"shop.png",
+				"shop.png",
+				"shop.png",},
+		is_ground_content = true,
+		-- light_source = 10,
+    groups = {dig_immediate=2},
+    sounds = default.node_sound_stone_defaults(),
 -- Registriere den Owner beim Platzieren:
     after_place_node = function(pos, placer, itemstack)
       if not minetest.check_player_privs(placer:get_player_name(), { adminshop=true }) then
@@ -22,6 +27,7 @@ minetest.register_node("adminshop:adminshop", {
       end
       local meta = minetest.get_meta(pos)
       meta:set_string("owner", placer:get_player_name())
+			meta:set_int("adminshop:counter", 0)
       local inv = meta:get_inventory()
       inv:set_size("einnahme", 2*2)
       inv:set_size("ausgabe", 2*2)
@@ -62,6 +68,7 @@ show_spec = function (player)
       --  "list["..listname..";einnahme;0,3.5;8,4;]"
      minetest.show_formspec(player:get_player_name(), "adminshop:adminshop", "size[8,7.5]"..
      "label[0,0;Welcome back, ".. meta:get_string("owner").."]" ..
+		 "label[3.5,1.15;Counter: "..meta:get_int("adminshop:counter").."]" ..
      "label[0,0.5;Paying:]" ..
      "list["..listname..";einnahme;0,1;2,2;]"..
      "label[6,0.5;Getting:]" ..
@@ -109,13 +116,14 @@ minetest.register_on_player_receive_fields(function(customer, formname, fields)
 
     end
     if enough_items and enough_space then
+			meta:set_int("adminshop:counter", meta:get_int("adminshop:counter") + 1)
       for i, item in pairs(wants) do
         pinv:remove_item("main",item)
       end
       for i, item in pairs(gives) do
         pinv:add_item("main",item)
       end
-      minetest.chat_send_player(customer:get_player_name(),"Exchanged!")
+      -- minetest.chat_send_player(customer:get_player_name(),"Exchanged!")
     elseif enough_space then
       minetest.chat_send_player(customer:get_player_name(),"You don't have the required items in your inventory!")
     else
@@ -131,10 +139,16 @@ if minetest.get_modpath("licenses") ~= nil then
 	minetest.register_node("adminshop:adminshop_license", {
 
 	    description = "Adminshop with licenses integrated",
-	    tiles = {"shop_licenses.png"},
+			tiles = {"shop_licenses_top.png",
+					"shop_licenses_top.png",
+					"shop_licenses.png",
+					"shop_licenses.png",
+					"shop_licenses.png",
+					"shop_licenses.png",},
+			-- light_source = 10,
 	    is_ground_content = true,
-	    groups = {choppy=2},
-	    sounds = default.node_sound_wood_defaults(),
+	    groups = {dig_immediate=2},
+	    sounds = default.node_sound_stone_defaults(),
 	-- Registriere den Owner beim Platzieren:
 	    after_place_node = function(pos, placer, itemstack)
 	      if not minetest.check_player_privs(placer:get_player_name(), { adminshop=true }) then
@@ -143,6 +157,7 @@ if minetest.get_modpath("licenses") ~= nil then
 	        minetest.remove_node(pos)
 	      end
 	      local meta = minetest.get_meta(pos)
+				meta:set_int("adminshop:counter", 0)
 	      meta:set_string("owner", placer:get_player_name())
 	      local inv = meta:get_inventory()
 	      inv:set_size("einnahme", 2*2)
@@ -180,6 +195,7 @@ if minetest.get_modpath("licenses") ~= nil then
 	    local meta = minetest.get_meta(pos)
 	    local listname = "nodemeta:"..pos.x..','..pos.y..','..pos.z
 			local licenses_string = ""
+			local licenses_required = ""
 			local ltable = minetest.deserialize(meta:get_string("adminshop:ltable"))
 			if ltable == nil then
 				ltable = {}
@@ -187,11 +203,16 @@ if minetest.get_modpath("licenses") ~= nil then
 			for k, v in pairs(ltable) do
 				 if v == "defined" then
 					 licenses_string = licenses_string  .. k ..","
+					 licenses_required = licenses_required .. k .. " "
 				 end
+			end
+			if licenses_required == "" then
+				licenses_required = "nothing"
 			end
 	    if player:get_player_name() == meta:get_string("owner") then
 	     minetest.show_formspec(player:get_player_name(), "adminshop:adminshop_license", "size[11,7.5]"..
 	     "label[0,0;Welcome back, ".. meta:get_string("owner").."]" ..
+			 "label[3.5,1.15;Counter: "..meta:get_int("adminshop:counter").."]" ..
 			 -- Licenses:
 			 "label[8,0;Licenses:]" ..
 			 "textlist[8,0.5;2.8,5;license_list;"..licenses_string.."]" ..
@@ -210,6 +231,7 @@ if minetest.get_modpath("licenses") ~= nil then
 	    else
 	      minetest.show_formspec(player:get_player_name(), "adminshop:adminshop_license", "size[8,7.5]"..
 	      "label[0,0;Welcome, "..player:get_player_name().."]" ..
+				"label[2.5,0;License required: "..licenses_required.."]" ..
 	      "label[0,0.5;Paying:]" ..
 	      "list["..listname..";einnahme;0,1;2,2;]"..
 	      "label[6,0.5;Getting:]" ..
@@ -268,13 +290,14 @@ if minetest.get_modpath("licenses") ~= nil then
 
 			--
 	    if enough_items and enough_space and allowed then
+				meta:set_int("adminshop:counter", meta:get_int("adminshop:counter") + 1)
 	      for i, item in pairs(wants) do
 	        pinv:remove_item("main",item)
 	      end
 	      for i, item in pairs(gives) do
 	        pinv:add_item("main",item)
 	      end
-	      minetest.chat_send_player(customer:get_player_name(),"Exchanged!")
+	      -- minetest.chat_send_player(customer:get_player_name(),"Exchanged!")
 			elseif not allowed then
 				minetest.chat_send_player(customer:get_player_name(),"You are not allowd to buy this!" )
 			elseif enough_space then
@@ -328,10 +351,16 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 	minetest.register_node("adminshop:adminshop_license_atm", {
 
 	    description = "Adminshop with licenses and atm integrated",
-	    tiles = {"shop_licenses.png"},
+			tiles = {"shop_licenses_top.png",
+					"shop_licenses_top.png",
+					"shop_licenses.png",
+					"shop_licenses.png",
+					"shop_licenses.png",
+					"shop_licenses.png",},
 	    is_ground_content = true,
-	    groups = {choppy=2},
-	    sounds = default.node_sound_wood_defaults(),
+			-- light_source = 10,
+	    groups = {dig_immediate=2},
+	    sounds = default.node_sound_stone_defaults(),
 	-- Registriere den Owner beim Platzieren:
 	    after_place_node = function(pos, placer, itemstack)
 	      if not minetest.check_player_privs(placer:get_player_name(), { adminshop=true }) then
@@ -343,6 +372,7 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 				meta:set_string("adminshop:bs", "Buy")
 				meta:set_int("adminshop:price", 0)
 	      meta:set_string("owner", placer:get_player_name())
+				meta:set_int("adminshop:counter", 0)
 	      local inv = meta:get_inventory()
 	      inv:set_size("einnahme", 2*2)
 	      inv:set_size("ausgabe", 2*2)
@@ -379,6 +409,7 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 	    local meta = minetest.get_meta(pos)
 	    local listname = "nodemeta:"..pos.x..','..pos.y..','..pos.z
 			local licenses_string = ""
+			local licenses_required = ""
 			local ltable = minetest.deserialize(meta:get_string("adminshop:ltable"))
 			if ltable == nil then
 				ltable = {}
@@ -386,11 +417,16 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 			for k, v in pairs(ltable) do
 				 if v == "defined" then
 					 licenses_string = licenses_string  .. k ..","
+					 licenses_required = licenses_required .. k .. " "
 				 end
+			end
+			if licenses_required == "" then
+				licenses_required = "nothing"
 			end
 	    if player:get_player_name() == meta:get_string("owner") then
 	     minetest.show_formspec(player:get_player_name(), "adminshop:adminshop_license_atm", "size[11,7.5]"..
 	     "label[0,0;Welcome back, ".. meta:get_string("owner").."]" ..
+			 "label[3.5,1.15;Counter: "..meta:get_int("adminshop:counter").."]" ..
 			 -- Licenses:
 			 "label[8,0;Licenses:]" ..
 			 "textlist[8,0.5;2.8,5;license_list;"..licenses_string.."]" ..
@@ -411,6 +447,7 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 	      "label[0,0;Welcome, "..player:get_player_name().."]" ..
 	      "label[0,0.5;Items:]" ..
 	      "list["..listname..";einnahme;0,1;2,2;]"..
+				"label[2.5,0;License required: "..licenses_required.."]" ..
 	      "label[5.7,1.45;Price: "..meta:get_string("adminshop:price").."]" ..
 				"label[5.7,1.8;Your Balance: "..atm.balance[player:get_player_name()].."]" ..
 	      "list[current_player;main;0,3.5;8,4;]" ..
@@ -485,6 +522,7 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 					end
 					atm.balance[customer:get_player_name()] = atm.balance[customer:get_player_name()] - meta:get_int("adminshop:price")
 					show_specl_atm(customer)
+					meta:set_int("adminshop:counter", meta:get_int("adminshop:counter") + 1)
 				elseif not allowed then
 					minetest.chat_send_player(customer:get_player_name(),"You are not allowed to buy this!" )
 				elseif not enough_space then
@@ -498,6 +536,7 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 				  end
 					atm.balance[customer:get_player_name()] = atm.balance[customer:get_player_name()] + meta:get_int("adminshop:price")
 					show_specl_atm(customer)
+					meta:set_int("adminshop:counter", meta:get_int("adminshop:counter") + 1)
 				elseif not allowed then
 					minetest.chat_send_player(customer:get_player_name(),"You are not allowed to buy this!" )
 				else
@@ -514,7 +553,7 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 	    --   for i, item in pairs(gives) do
 	    --     pinv:add_item("main",item)
 	    --   end
-	    --   minetest.chat_send_player(customer:get_player_name(),"Exchanged!")
+	    --   -- minetest.chat_send_player(customer:get_player_name(),"Exchanged!")
 			-- elseif not allowed then
 			-- 	minetest.chat_send_player(customer:get_player_name(),"You are not allowd to buy this!" )
 			-- elseif enough_space then
