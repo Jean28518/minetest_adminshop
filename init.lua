@@ -411,6 +411,9 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 			local licenses_string = ""
 			local licenses_required = ""
 			local ltable = minetest.deserialize(meta:get_string("adminshop:ltable"))
+			if atm.balance[player:get_player_name()] == nil then
+				atm.balance[player:get_player_name()] = 0
+			end
 			if ltable == nil then
 				ltable = {}
 			end
