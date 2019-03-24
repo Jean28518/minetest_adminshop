@@ -35,7 +35,7 @@ minetest.register_node("adminshop:adminshop", {
     on_rightclick = function(pos, node, player, itemstack, pointed_thing)
       -- Schreibe die eigene Position des Blockes in eine öffentliche Variable mit dem Namen des Spielernamens, welcher auf den Block zugegriffen hat
       default.adminshop_current_shop_position[player:get_player_name()] = pos
-      show_spec(player)
+      adminshop_show_spec(player)
       --end
     end,
     allow_metadata_inventory_put = function(pos, listname, index, stack, player)
@@ -59,7 +59,7 @@ minetest.register_node("adminshop:adminshop", {
 
 })
 
-show_spec = function (player)
+adminshop_show_spec = function (player)
     local pos = default.adminshop_current_shop_position[player:get_player_name()]
     local meta = minetest.get_meta(pos)
     local listname = "nodemeta:"..pos.x..','..pos.y..','..pos.z
@@ -411,6 +411,9 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 			local licenses_string = ""
 			local licenses_required = ""
 			local ltable = minetest.deserialize(meta:get_string("adminshop:ltable"))
+			if atm.balance[player:get_player_name()] == nil then
+				atm.balance[player:get_player_name()] = 0
+			end
 			if ltable == nil then
 				ltable = {}
 			end
