@@ -3,6 +3,9 @@ minetest.register_privilege("adminshop", {
 	give_to_singleplayer= true,
 })
 
+local jeans_economy = false
+if minetest.get_modpath("jeans_economy") then jeans_economy = true end
+
 -- Adminshop
 -- Globaler Arrayspeicher
 default.adminshop_current_shop_position = {}
@@ -520,8 +523,17 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 			-- BUY:
 			if meta:get_string("adminshop:bs") == "Buy" then
 				if enough_space and allowed then
+					local item_name = "Nothing"
+					local item_count = 1
 					for i, item in pairs(items) do
 						pinv:add_item("main",item)
+						if item_name == "Nothing" or item_name == "" then
+							item_name = item:get_name()
+							item_count = item:get_count()
+						 end
+					end
+					if jeans_economy then
+						jeans_economy_save(customer:get_player_name(), "Server", meta:get_int("adminshop:price"), customer:get_player_name().." buys "..item_count.." "..item_name.." at the adminshop")
 					end
 					atm.balance[customer:get_player_name()] = atm.balance[customer:get_player_name()] - meta:get_int("adminshop:price")
 					show_specl_atm(customer)
@@ -534,9 +546,18 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 			-- SELL:
 			else
 				if allowed and enough_items then
+					local item_name = "Nothing"
+					local item_count = 1
 					for i, item in pairs(items) do
 				 	 pinv:remove_item("main",item)
+					 if item_name == "Nothing" or item_name == "" then
+						 item_name = item:get_name()
+						 item_count = item:get_count()
+				 		end
 				  end
+					if jeans_economy then
+						jeans_economy_save(customer:get_player_name(), "Server", meta:get_int("adminshop:price"), customer:get_player_name().." sells "..item_count.." "..item_name.." to the adminshop")
+					end
 					atm.balance[customer:get_player_name()] = atm.balance[customer:get_player_name()] + meta:get_int("adminshop:price")
 					show_specl_atm(customer)
 					meta:set_int("adminshop:counter", meta:get_int("adminshop:counter") + 1)
