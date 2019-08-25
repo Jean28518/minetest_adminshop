@@ -4,7 +4,7 @@ Github: https://github.com/Jean28518/minetest_adminshop
 Mod for Minetest, which adds adminshops.
 
 There are no crafting recipe available.
-To place and to break adminshops you need the "adminshop" privilege assigned. Only the owner (placer) of the adminshop is able to change the offer.
+To place and to break adminshops you need the "adminshop" privilege assigned. Every Player with the "adminshop" privilege is able to configure an adminshop.
 
 ## Optional: How to work with licenses and adminshop
 The Mod can be found at: https://github.com/Jean28518/minetest_licenses

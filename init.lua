@@ -66,11 +66,13 @@ adminshop_show_spec = function (player)
     local pos = default.adminshop_current_shop_position[player:get_player_name()]
     local meta = minetest.get_meta(pos)
     local listname = "nodemeta:"..pos.x..','..pos.y..','..pos.z
-    if player:get_player_name() == meta:get_string("owner") then
+--    if player:get_player_name() == meta:get_string("owner") then
+		if minetest.check_player_privs(player:get_player_name(), { adminshop=true }) then
+
       --"label[0,0;Welcome back, " .. meta:get_string("owner") ..
       --  "list["..listname..";einnahme;0,3.5;8,4;]"
      minetest.show_formspec(player:get_player_name(), "adminshop:adminshop", "size[8,7.5]"..
-     "label[0,0;Welcome back, ".. meta:get_string("owner").."]" ..
+     "label[0,0;Welcome back, ".. player:get_player_name().."]" ..
 		 "label[3.5,1.15;Counter: "..meta:get_int("adminshop:counter").."]" ..
      "label[0,0.5;Paying:]" ..
      "list["..listname..";einnahme;0,1;2,2;]"..
@@ -212,9 +214,10 @@ if minetest.get_modpath("licenses") ~= nil then
 			if licenses_required == "" then
 				licenses_required = "nothing"
 			end
-	    if player:get_player_name() == meta:get_string("owner") then
+	--    if player:get_player_name() == meta:get_string("owner") then
+			if minetest.check_player_privs(player:get_player_name(), { adminshop=true }) then
 	     minetest.show_formspec(player:get_player_name(), "adminshop:adminshop_license", "size[11,7.5]"..
-	     "label[0,0;Welcome back, ".. meta:get_string("owner").."]" ..
+	     "label[0,0;Welcome back, ".. player:get_player_name().."]" ..
 			 "label[3.5,1.15;Counter: "..meta:get_int("adminshop:counter").."]" ..
 			 -- Licenses:
 			 "label[8,0;Licenses:]" ..
@@ -429,9 +432,10 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 			if licenses_required == "" then
 				licenses_required = "nothing"
 			end
-	    if player:get_player_name() == meta:get_string("owner") then
+	--    if player:get_player_name() == meta:get_string("owner") then
+			if minetest.check_player_privs(player:get_player_name(), { adminshop=true }) then
 	     minetest.show_formspec(player:get_player_name(), "adminshop:adminshop_license_atm", "size[11,7.5]"..
-	     "label[0,0;Welcome back, ".. meta:get_string("owner").."]" ..
+	     "label[0,0;Welcome back, ".. player:get_player_name().."]" ..
 			 "label[3.5,1.15;Counter: "..meta:get_int("adminshop:counter").."]" ..
 			 -- Licenses:
 			 "label[8,0;Licenses:]" ..
@@ -556,7 +560,7 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 				 		end
 				  end
 					if jeans_economy then
-						jeans_economy_save(customer:get_player_name(), "Server", meta:get_int("adminshop:price"), customer:get_player_name().." sells "..item_count.." "..item_name.." to the adminshop")
+						jeans_economy_save("Server", customer:get_player_name(), meta:get_int("adminshop:price"), customer:get_player_name().." sells "..item_count.." "..item_name.." to the adminshop")
 					end
 					atm.balance[customer:get_player_name()] = atm.balance[customer:get_player_name()] + meta:get_int("adminshop:price")
 					show_specl_atm(customer)
