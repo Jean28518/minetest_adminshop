@@ -43,12 +43,12 @@ minetest.register_node("adminshop:adminshop", {
     end,
     allow_metadata_inventory_put = function(pos, listname, index, stack, player)
       local meta = minetest.get_meta(pos)
-      if player:get_player_name() ~= meta:get_string("owner") then return 0 end
+      if not minetest.check_player_privs(player:get_player_name(), { adminshop=true }) then return 0 end
       return stack:get_count()
     end,
     allow_metadata_inventory_take = function(pos, listname, index, stack, player)
       local meta = minetest.get_meta(pos)
-      if player:get_player_name() ~= meta:get_string("owner") then return 0 end
+      if not minetest.check_player_privs(player:get_player_name(), { adminshop=true }) then return 0 end
       return stack:get_count()
     end,
     can_dig = function(pos, player)
@@ -176,12 +176,12 @@ if minetest.get_modpath("licenses") ~= nil then
 	    end,
 	    allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 	      local meta = minetest.get_meta(pos)
-	      if player:get_player_name() ~= meta:get_string("owner") then return 0 end
+	      if not minetest.check_player_privs(player:get_player_name(), { adminshop=true }) then return 0 end
 	      return stack:get_count()
 	    end,
 	    allow_metadata_inventory_take = function(pos, listname, index, stack, player)
 	      local meta = minetest.get_meta(pos)
-	      if player:get_player_name() ~= meta:get_string("owner") then return 0 end
+	      if not minetest.check_player_privs(player:get_player_name(), { adminshop=true }) then return 0 end
 	      return stack:get_count()
 	    end,
 	    can_dig = function(pos, player)
@@ -391,12 +391,12 @@ if minetest.get_modpath("licenses") ~= nil and minetest.get_modpath("currency") 
 	    end,
 	    allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 	      local meta = minetest.get_meta(pos)
-	      if player:get_player_name() ~= meta:get_string("owner") then return 0 end
+	      if not minetest.check_player_privs(player:get_player_name(), { adminshop=true }) then return 0 end
 	      return stack:get_count()
 	    end,
 	    allow_metadata_inventory_take = function(pos, listname, index, stack, player)
 	      local meta = minetest.get_meta(pos)
-	      if player:get_player_name() ~= meta:get_string("owner") then return 0 end
+	      if not minetest.check_player_privs(player:get_player_name(), { adminshop=true }) then return 0 end
 	      return stack:get_count()
 	    end,
 	    can_dig = function(pos, player)
